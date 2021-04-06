@@ -1,0 +1,9 @@
+GPATH
+GTAGS
+GRTAGS
+\#*
+*~
+straight/
+*.eld
+.local/
+

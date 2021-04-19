@@ -27,103 +27,11 @@
 (straight-use-package 'flycheck)
 (straight-use-package 'lsp-mode)
 (straight-use-package 'exec-path-from-shell)
-
+(straight-use-package 'slime)
 (straight-use-package 'haskell-mode)
-
-;; ---------------------------------------------------------------------
-;; GNU Emacs / N Λ N O - Emacs made simple
-;; Copyright (C) 2020 - N Λ N O developers
-;;
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this program. If not, see <http://www.gnu.org/licenses/>.
-;; ---------------------------------------------------------------------
-
-
-;; Path to nano emacs modules (mandatory)
-;;(add-to-list 'load-path "/Users/mike/.emacs.d/nano-emacs")
-;;(add-to-list 'load-path ".")
-;;
-;;;; Default layout (optional)
-;;(require 'nano-layout)
-;;
-;;;; Theming Command line options (this will cancel warning messages)
-;;(add-to-list 'command-switch-alist '("-dark"   . (lambda (args))))
-;;(add-to-list 'command-switch-alist '("-light"  . (lambda (args))))
-;;(add-to-list 'command-switch-alist '("-default"  . (lambda (args))))
-;;(add-to-list 'command-switch-alist '("-no-splash" . (lambda (args))))
-;;(add-to-list 'command-switch-alist '("-no-help" . (lambda (args))))
-;;(add-to-list 'command-switch-alist '("-compact" . (lambda (args))))
-;;
-;;
-;;(cond
-;; ((member "-default" command-line-args) t)
-;; ((member "-dark" command-line-args) (require 'nano-theme-dark))
-;; (t (require 'nano-theme-light)))
-;;
-;;;; Customize support for 'emacs -q' (Optional)
-;;;; You can enable customizations by creating the nano-custom.el file
-;;;; with e.g. `touch nano-custom.el` in the folder containing this file.
-;;(let* ((this-file  (or load-file-name (buffer-file-name)))
-;;       (this-dir  (file-name-directory this-file))
-;;       (custom-path  (concat this-dir "nano-custom.el")))
-;;  (when (and (eq nil user-init-file)
-;;             (eq nil custom-file)
-;;             (file-exists-p custom-path))
-;;    (setq user-init-file this-file)
-;;    (setq custom-file custom-path)
-;;    (load custom-file)))
-;;
-;;;; Theme
-;;(require 'nano-faces)
-;;(nano-faces)
-;;
-;;(require 'nano-theme)
-;;(nano-theme)
-;;
-;;;; Nano default settings (optional)
-;;(require 'nano-defaults)
-;;
-;;;; Nano session saving (optional)
-;;(require 'nano-session)
-;;
-;;;; Nano header & mode lines (optional)
-;;(require 'nano-modeline)
-;;
-;;;; Nano key bindings modification (optional)
-;;(require 'nano-bindings)
-;;
-;;;; Compact layout (need to be loaded after nano-modeline)
-;;(when (member "-compact" command-line-args)
-;;  (require 'nano-compact))
-;;  
-;;;; Nano counsel configuration (optional)
-;;;; Needs "counsel" package to be installed (M-x: package-install)
-;;;; (require 'nano-counsel)
-;;
-;;;; Welcome message (optional)
-;;(let ((inhibit-message t))
-;;  (message "Welcome to GNU Emacs / N Λ N O edition")
-;;  (message (format "Initialization time: %s" (emacs-init-time))))
-;;
-;;;; Splash (optional)
-;;(unless (member "-no-splash" command-line-args)
-;;  (require 'nano-splash))
-;;
-;;;; Help (optional)
-;;(unless (member "-no-help" command-line-args)
-;;  (require 'nano-help))
-;;
-;;(provide 'nano)
+(straight-use-package 'paredit)
+(straight-use-package 'elcord)
+(straight-use-package 'evil-cleverparens)
 
 (add-to-list 'default-frame-alist '(font . "Roboto Mono"))
 (set-face-attribute 'default t :font "Roboto Mono")
@@ -134,39 +42,91 @@
 
 ;; Setup packages
 (require 'evil)
-(require 'evil-leader)
 (require 'which-key)
 (require 'ivy)
 (require 'company)
 (require 'flycheck)
 
 ;; evil
+(evil-set-leader 'normal (kbd "SPC"))
+(defvar leader-map (make-sparse-keymap))
+(defvar buffer-subkeymap (make-sparse-keymap))
+(defvar file-subkeymap (make-sparse-keymap))
+(defvar window-subkeymap (make-sparse-keymap))
+(defvar lisp-subkeymap (make-sparse-keymap))
+(defvar lisp-eval-subkeymap (make-sparse-keymap))
+(evil-define-key 'normal 'global (kbd "SPC") leader-map)
+(define-key leader-map (kbd "b") buffer-subkeymap)
+(define-key leader-map (kbd "f") file-subkeymap)
+(define-key leader-map (kbd "w") window-subkeymap)
+(define-key leader-map (kbd "l") lisp-subkeymap)
 
-;; evil-leader
-(setq evil-leader/in-all-states 1)
-(evil-leader/set-leader "SPC")
-(evil-leader/set-key "ff" 'find-file)
 
-(evil-leader/set-key "bb" 'buffer-menu)
-(evil-leader/set-key "be" 'eval-buffer)
+;; "SPC b" Buffer
+(define-key buffer-subkeymap "b" 'list-buffers)
+(define-key buffer-subkeymap "e" 'eval-buffer)
+(define-key buffer-subkeymap "l" 'evil-switch-to-windows-last-buffer)
+(define-key buffer-subkeymap "k" 'kill-buffer)
 
-(evil-leader/set-key "ws" 'split-window-below)
-(evil-leader/set-key "wv" 'split-window-right)
-(evil-leader/set-key "wj" 'windmove-down)
-(evil-leader/set-key "wk" 'windmove-up)
-(evil-leader/set-key "wh" 'windmove-left)
-(evil-leader/set-key "wl" 'windmove-right)
-(evil-leader/set-key "wd" 'delete-window)
-(evil-leader/set-key "p" 'projectile-command-map)
+;; "SPC f" File
+(define-key file-subkeymap "f" 'find-file)
+
+;; "SPC w" Window
+(define-key window-subkeymap "s" 'split-window-below)
+(define-key window-subkeymap "v" 'split-window-right)
+(define-key window-subkeymap "j" 'windmove-down)
+(define-key window-subkeymap "k" 'windmove-up)
+(define-key window-subkeymap "h" 'windmove-left)
+(define-key window-subkeymap "l" 'windmove-right)
+(define-key window-subkeymap "d" 'delete-window)
+
+;; "SPC l" Lisp
+(define-key lisp-subkeymap (kbd "e") lisp-eval-subkeymap)
+(define-key lisp-subkeymap (kbd "s") 'slime)
+;; "SPC l e" Lisp-Eval
+(define-key lisp-eval-subkeymap (kbd "b") 'slime-eval-buffer)
+(define-key lisp-eval-subkeymap (kbd "r") 'slime-eval-region)
+(define-key lisp-eval-subkeymap (kbd "e") 'slime-eval-last-expression)
 
 ;; which-key
 (which-key-setup-side-window-right)
+(which-key-add-key-based-replacements
+    "<SPC> b" "Buffer"
+    "<SPC> e" "Eval"
+    "<SPC> f" "File"
+    "<SPC> p" "Project"
+    "<SPC> w" "Window"
+    "<SPC> l" "Lisp"
+    "<SPC> l e" "Lisp-Eval"
+    )
 
 ;; sr-speedbar
 (setq speedbar-use-images nil)
 
 ;; company
 (add-hook 'after-init-hook 'global-company-mode)
+
+;; slime
+(setq inferior-lisp-program "sbcl")
+(add-hook 'common-lisp-lisp-mode-hook
+	  (lambda ()
+	    (slime)
+	    (slime-mode)
+	    ))
+(add-hook 'slime-mode-hook
+	  (lambda ()
+	    ))
+(add-to-list 'auto-mode-alist
+	     '("\\.cl\\'" . common-lisp-mode)
+	     )
+
+;; smartparens
+(smartparens-global-mode)
+(setq sp-highlight-pair-overlay nil)
+(setq sp-highlight-wrap-overlay nil)
+(setq sp-highlight-wrap-tag-overlay nil)
+(sp-pair "'" nil :actions :rem)
+(sp-pair "\"" nil :actions :rem)
 
 ;; enable modes
 (exec-path-from-shell-initialize)
@@ -177,12 +137,14 @@
 (evil-collection-init)
 (counsel-projectile-mode)
 (global-flycheck-mode)
+(elcord-mode)
 
 ;; default emacs configuration
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (set-default 'truncate-lines t)
 (setq ispell-program-name "/opt/homebrew/bin/ispell")
+(setq browse-url-browser-function 'eww-browse-url)
 
 (if mode-line-format
     (progn
